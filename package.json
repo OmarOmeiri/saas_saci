@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "echo server running on http://localhost:4000/ && webpack-dev-server --mode development",
+    "dev": "echo server running on http://localhost:4000/ && webpack-dev-server --mode development",
     "build": "webpack --mode production",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +21,7 @@
     "css-loader": "^6.8.1",
     "eslint": "^9.8.0",
     "html-webpack-plugin": "^5.5.3",
+    "husky": "^9.1.4",
     "mini-css-extract-plugin": "^2.7.6",
     "ts-loader": "^9.4.4",
     "typescript": "^5.5.4",

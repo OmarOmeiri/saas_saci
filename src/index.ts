@@ -4,6 +4,7 @@ import { saasToData, saciToData } from './data';
 import { compareData } from './compare';
 import { getNotRegisteredStudents } from './export';
 import { download } from './utils';
+import { SAAS_CODE } from './consts';
 
 export type TData = {header: string[], data: string[][]}
 
@@ -15,10 +16,13 @@ function main(): void {
     const upldSaciBtn = document.querySelector("#upld-saci");
     const compareBtn = document.querySelector("#compare-btn");
     const exportBtn = document.querySelector("#export-students-btn");
+    const downloadSAASCodeBtn = document.querySelector("#download-saas-btn");
+    
     upldSaasBtn?.addEventListener("click", updlSaasBtnHandler);
     upldSaciBtn?.addEventListener("click", updlSaciBtnHandler);
     compareBtn?.addEventListener("click", compareBtnHandler);
     exportBtn?.addEventListener("click", exportStudentsBtnHandler);
+    downloadSAASCodeBtn?.addEventListener("click", downloadSAASCodeBtnHandler);
 }
 
 function updlSaciBtnHandler(e: MouseEvent): void {
@@ -47,6 +51,11 @@ function updlSaasBtnHandler(e: MouseEvent): void {
     saas = data;
   };
   input.click();
+}
+
+function downloadSAASCodeBtnHandler(e: MouseEvent): void {
+  e.preventDefault();
+  download(SAAS_CODE, 'saas_code.txt');
 }
 
 function divergentTrMouseEnterHandler(e: MouseEvent): void {
