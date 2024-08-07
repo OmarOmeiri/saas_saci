@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import { groupBy } from "lodash";
-import { arrayOuterJoin, countArrFrequency, saciTimeToDecimal } from "./utils";
+import { groupBy, isEqual } from "lodash";
+import { arrayDiff, saciTimeToDecimal } from "./utils";
 import { TData } from ".";
 
 type TCompare = {
@@ -16,6 +16,12 @@ type TCompare = {
 
 export type TDivergence = {id: string, msg: string}
 export type TDivergences = {id: string, msg: string[]}
+
+const noId = (o: TCompare) => {
+  const d = {...o};
+  delete d.id;
+  return d;
+}
 
 const getCanacSaas = (str: string) => {
   try {
@@ -89,131 +95,31 @@ const checkDateDivergences = (saasDayData: TCompare[], saciDayData: TCompare[]) 
   }, [] as TDivergence[])
 };
 
-const checkStudentDivergences = (saasDayData: TCompare[], saciDayData: TCompare[]) => {
-  const saasDayStudents = saasDayData.map(d => d.canac);
-  const saciDayStudents = saciDayData.map(d => d.canac);
-  const saasFreq = countArrFrequency(saasDayStudents)
-  const saciFreq = countArrFrequency(saciDayStudents)
-  const studentKeyDivergences = arrayOuterJoin(Object.keys(saasFreq), Object.keys(saciFreq));
-  const studentFreqDivergences: string[] = []
-  for (const key of Array.from(new Set([...Object.keys(saasFreq), ...Object.keys(saciFreq)]))) {
-    if (saasFreq[key] === saciFreq[key]) continue;
-    studentFreqDivergences.push(key)
+const checkIfAllFlightsAreRegistered = (saasDayData: TCompare[], saciDayData: TCompare[]): {notFoundIds: string[], divergences: TDivergence[]} => {
+  const foundSaciIds: Set<string> = new Set();
+  const foundSaasIds: Set<string> = new Set();
+  const allSaasIds = saasDayData.map(d => d.id);
+  for (const saasLine of saasDayData) {
+    const found = saciDayData.find((s) => (
+      isEqual(noId(s), noId(saasLine))
+      && !foundSaciIds.has(s.id)
+    ));
+
+    if (found) {
+      foundSaciIds.add(found.id);
+      foundSaasIds.add(saasLine.id);
+    }
   }
 
-  return saasDayData.reduce((divergIds, d) => {
-    if (
-      studentFreqDivergences.includes(d.canac)
-      || studentKeyDivergences.includes(d.canac)
-    ) divergIds.push({id: d.id, msg: 'Este voo não está cadastrado no SACI.'});
-    return divergIds;
-  }, [] as TDivergence[])
-};
-
-const checkTDayDivergences = (saasDayData: TCompare[], saciDayData: TCompare[]) => {
-  const saasDayTime = saasDayData.map(d => d.tDay);
-  const saciDayTime = saciDayData.map(d => d.tDay);
-  const saasFreq = countArrFrequency(saasDayTime)
-  const saciFreq = countArrFrequency(saciDayTime)
-  const keyDivergences = arrayOuterJoin(Object.keys(saasFreq), Object.keys(saciFreq));
-  const freqDivergences: string[] = []
-  for (const key of Array.from(new Set([...Object.keys(saasFreq), ...Object.keys(saciFreq)]))) {
-    if (saasFreq[key as unknown as number] === saciFreq[key as unknown as number]) continue;
-    freqDivergences.push(key)
+  const notFoundIds = arrayDiff(allSaasIds, Array.from(foundSaasIds));
+  if (notFoundIds.length) {
+    console.log('saasDayData: ', saasDayData);
+    console.log('saciDayData: ', saciDayData);
   }
 
-  return saasDayData.reduce((divergIds, d) => {
-    if (
-      freqDivergences.includes(d.canac)
-      || keyDivergences.includes(d.canac)
-    ) divergIds.push({id: d.id, msg: 'Este voo esta com divergência no tempo DIURNO.'});
-    return divergIds;
-  }, [] as TDivergence[])
-};
+  return {notFoundIds, divergences: notFoundIds.map(id => ({id, msg: 'Este voo não está cadastrado no SACI.'}))}
+}
 
-const checkTNightDivergences = (saasDayData: TCompare[], saciDayData: TCompare[]) => {
-  const saasNIghtTime = saasDayData.map(d => d.tNight);
-  const saciNightTime = saciDayData.map(d => d.tNight);
-  const saasFreq = countArrFrequency(saasNIghtTime)
-  const saciFreq = countArrFrequency(saciNightTime)
-  const keyDivergences = arrayOuterJoin(Object.keys(saasFreq), Object.keys(saciFreq));
-  const freqDivergences: string[] = []
-  for (const key of Array.from(new Set([...Object.keys(saasFreq), ...Object.keys(saciFreq)]))) {
-    if (saasFreq[key as unknown as number] === saciFreq[key as unknown as number]) continue;
-    freqDivergences.push(key)
-  }
-
-  return saasDayData.reduce((divergIds, d) => {
-    if (
-      freqDivergences.includes(d.canac)
-      || keyDivergences.includes(d.canac)
-    ) divergIds.push({id: d.id, msg: 'Este voo esta com divergência no tempo NOTURNO.'});
-    return divergIds;
-  }, [] as TDivergence[])
-};
-
-const checkTNavDivergences = (saasDayData: TCompare[], saciDayData: TCompare[]) => {
-  const saasNavTime = saasDayData.map(d => d.tNav);
-  const saciNavTime = saciDayData.map(d => d.tNav);
-  const saasFreq = countArrFrequency(saasNavTime)
-  const saciFreq = countArrFrequency(saciNavTime)
-  const keyDivergences = arrayOuterJoin(Object.keys(saasFreq), Object.keys(saciFreq));
-  const freqDivergences: string[] = []
-  for (const key of Array.from(new Set([...Object.keys(saasFreq), ...Object.keys(saciFreq)]))) {
-    if (saasFreq[key as unknown as number] === saciFreq[key as unknown as number]) continue;
-    freqDivergences.push(key)
-  }
-
-  return saasDayData.reduce((divergIds, d) => {
-    if (
-      freqDivergences.includes(d.canac)
-      || keyDivergences.includes(d.canac)
-    ) divergIds.push({id: d.id, msg: 'Este voo esta com divergência no tempo NAV.'});
-    return divergIds;
-  }, [] as TDivergence[])
-};
-
-const checkLdgDivergences = (saasDayData: TCompare[], saciDayData: TCompare[]) => {
-  const saasLdgs = saasDayData.map(d => d.ldg);
-  const saciLdgs = saciDayData.map(d => d.ldg);
-  const saasFreq = countArrFrequency(saasLdgs)
-  const saciFreq = countArrFrequency(saciLdgs)
-  const keyDivergences = arrayOuterJoin(Object.keys(saasFreq), Object.keys(saciFreq));
-  const freqDivergences: string[] = []
-  for (const key of Array.from(new Set([...Object.keys(saasFreq), ...Object.keys(saciFreq)]))) {
-    if (saasFreq[key as unknown as number] === saciFreq[key as unknown as number]) continue;
-    freqDivergences.push(key)
-  }
-
-  return saasDayData.reduce((divergIds, d) => {
-    if (
-      freqDivergences.includes(d.canac)
-      || keyDivergences.includes(d.canac)
-    ) divergIds.push({id: d.id, msg: 'Este voo esta com divergência no número de pousos.'});
-    return divergIds;
-  }, [] as TDivergence[])
-};
-
-const checkMatDivergences = (saasDayData: TCompare[], saciDayData: TCompare[]) => {
-  const saasMat = saasDayData.map(d => d.mat);
-  const saciMat = saciDayData.map(d => d.mat);
-  const saasFreq = countArrFrequency(saasMat)
-  const saciFreq = countArrFrequency(saciMat)
-  const keyDivergences = arrayOuterJoin(Object.keys(saasFreq), Object.keys(saciFreq));
-  const freqDivergences: string[] = []
-  for (const key of Array.from(new Set([...Object.keys(saasFreq), ...Object.keys(saciFreq)]))) {
-    if (saasFreq[key as unknown as number] === saciFreq[key as unknown as number]) continue;
-    freqDivergences.push(key)
-  }
-
-  return saasDayData.reduce((divergIds, d) => {
-    if (
-      freqDivergences.includes(d.canac)
-      || keyDivergences.includes(d.canac)
-    ) divergIds.push({id: d.id, msg: 'Este voo esta com divergência na matrícula.'});
-    return divergIds;
-  }, [] as TDivergence[])
-};
 
 export const compareData = (saci: TData, saas: TData) => {
   const saasCData = getSaasCompareData(saas);
@@ -234,12 +140,9 @@ export const compareData = (saci: TData, saas: TData) => {
       continue;
     }
 
-    divergences.push(...checkStudentDivergences(saasDayData, saciDayData));
-    divergences.push(...checkTDayDivergences(saasDayData, saciDayData));
-    divergences.push(...checkTNightDivergences(saasDayData, saciDayData));
-    divergences.push(...checkTNavDivergences(saasDayData, saciDayData));
-    divergences.push(...checkLdgDivergences(saasDayData, saciDayData));
-    divergences.push(...checkMatDivergences(saasDayData, saciDayData));
+    const notRegisteredFlights = checkIfAllFlightsAreRegistered(saasDayData, saciDayData);
+
+    divergences.push(...notRegisteredFlights.divergences);
   }
   
   return Object.values(groupBy(divergences, (d) => d.id))

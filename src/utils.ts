@@ -1,6 +1,6 @@
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { isEqual } from "lodash"
+import { isEqual, uniqBy } from "lodash"
 
 dayjs.extend(customParseFormat)
 
@@ -36,19 +36,29 @@ export const arrayOuterJoin = <T>(arr1: T[], arr2: T[]): T[] => {
   ];
 };
 
+/**
+ * Returns the difference between two arrays.
+ * @param arr1
+ * @param arr2
+ * @returns the elements that are in 'arr1' but not in 'arr2'
+ */
+export const arrayDiff = <T>(arr1: T[], arr2: T[]) => {
+  return arr1.filter((x) => !arr2.some((y) => isEqual(x, y)));
+};
+
 export const saciTimeToDecimal = (str: string) => {
   const [h, m] = str.split(':').map(Number);
-  if (m < 6) return h;
-  if (m >= 6 && m < 12) return h + 0.1;
-  if (m >= 12 && m < 18) return h + 0.2;
-  if (m >= 18 && m < 24) return h + 0.3;
-  if (m >= 24 && m < 30) return h + 0.4;
-  if (m >= 30 && m < 36) return h + 0.5;
-  if (m >= 36 && m < 42) return h + 0.6;
-  if (m >= 42 && m < 48) return h + 0.7;
-  if (m >= 48 && m < 54) return h + 0.8;
-  if (m >= 54 && m < 60) return h + 0.9;
-  return h
+  if (m < 4) return h;
+  if (m >= 4 && m <= 9) return h + 0.1;
+  if (m >= 10 && m <= 15) return h + 0.2;
+  if (m >= 16 && m <= 21) return h + 0.3;
+  if (m >= 22 && m <= 27) return h + 0.4;
+  if (m >= 28 && m <= 33) return h + 0.5;
+  if (m >= 34 && m <= 39) return h + 0.6;
+  if (m >= 40 && m <= 45) return h + 0.7;
+  if (m >= 46 && m <= 51) return h + 0.8;
+  if (m >= 52 && m <= 57) return h + 0.9;
+  return h + 1
 }
 
 
@@ -61,3 +71,11 @@ export const download = (str: string, name: string) => {
   
   URL.revokeObjectURL(tempLink.href);  
 };
+
+/**
+ * Removes duplicates of an array of objects by a given UNIQUE key
+ * @param objArr
+ */
+export function rmvObjDuplicatesByKey<T extends Record<string, unknown>[]>(objArr: T, key: string): T {
+  return uniqBy(objArr, key) as unknown as T;
+}

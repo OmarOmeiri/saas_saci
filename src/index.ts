@@ -29,11 +29,12 @@ function updlSaciBtnHandler(e: MouseEvent): void {
   e.preventDefault();
   const input = document.createElement("input");
   input.type = "file";
-  input.setAttribute("accept", ".csv");
+  input.setAttribute("accept", ".csv, .xlt");
   input.onchange = async function (event: InputEvent) {
     const target = event.target as HTMLInputElement;
-    const decoded = new TextDecoder('iso-8859-1').decode(await target.files.item(0).arrayBuffer());
-    const data = await saciToData(decoded);
+    const file = target.files.item(0);
+    const decoded = new TextDecoder('iso-8859-1').decode(await file.arrayBuffer());
+    const data = await saciToData(decoded, file.name.endsWith('.xlt'));
     makeTable(data, 'saci-tbl');
     saci = data;
   };
@@ -109,6 +110,12 @@ function compareBtnHandler() {
   if (!hasDataCheck()) return;
 
   const divergentIds = compareData(saci, saas);
+  if (!divergentIds.length) {
+    Array.from(document.querySelectorAll('#saas-tbl tr'))
+      .forEach((tr) => tr.classList.remove('divergent-tr'))
+
+    alert('Parabéns! nenhuma divergência foi encontrada.');
+  }
   for (const divergentId of divergentIds) {
     const divergentTr = document.getElementById(divergentId.id);
     if (!divergentTr) {

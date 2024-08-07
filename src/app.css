@@ -5,6 +5,7 @@ html {
 
 body {
   height: 100%;
+  margin: 0;
 }
 
 .container {
@@ -23,7 +24,9 @@ tbody tr:nth-child(odd) {
 
 .saas,
 .saci {
-  width: calc(50% - 60px);
+  width: calc(50% - 65px);
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .compare {
