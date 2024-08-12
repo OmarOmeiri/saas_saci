@@ -1,16 +1,21 @@
 import dayjs from "dayjs";
 import { groupBy, isEqual } from "lodash";
-import { arrayDiff, saciTimeToDecimal } from "./utils";
-import { TData } from ".";
+import { arrayDiff } from "./utils";
 
 type TCompare = {
   date: Date;
   canac: string;
+  dep: string;
+  arr: string;
   mat: string;
+  tTotal: number;
   tDay: number;
   tNight: number;
   tNav: number;
+  tIFR: number;
+  tCapt: number;
   ldg: number;
+  nm: number;
   id: string;
 }
 
@@ -23,64 +28,45 @@ const noId = (o: TCompare) => {
   return d;
 }
 
-const getCanacSaas = (str: string) => {
-  try {
-    const [canac] = /\(.*\)/.exec(str)
-    return canac.replace(/\(|\)/g, '').trim();
-  } catch {
-    return ''
-  }
-}
 
-const getCanacSaci = (str: string) => {
-  try {
-    const [canac] = /\d+/.exec(str)
-    return canac.replace(/\(|\)/g, '').trim();
-  } catch {
-    return ''
-  }
-}
-
-const getSaasCompareData = (saas: TData): TCompare[] => (
-  saas.data.map(sd => {
-    const date = dayjs(sd[1], 'DD/MM/YYYY').toDate();
-    const canac = getCanacSaas(sd[2]);
-    const mat = sd[4].replace('-', '').trim();
-    const tDay = Number(sd[7]);
-    const tNight = Number(sd[8]);
-    const tNav = Number(sd[9]);
-    const ldg = Number(sd[12]);
+const getSaasCompareData = (saas: SAASData[]) => (
+  saas.map(sd => {
     return {
-      date,
-      canac,
-      mat,
-      tDay,
-      tNight,
-      tNav,
-      ldg,
-      id: sd[sd.length - 1]
+      date: dayjs(sd.date, 'DD/MM/YYYY').toDate(),
+      canac: sd.studentCanac,
+      dep: sd.dep,
+      arr: sd.arr,
+      mat: sd.acft,
+      tTotal: sd.tTotal,
+      tDay: sd.tDay,
+      tNight: sd.tNight,
+      tNav: sd.tNav,
+      tIFR: sd.tIFR,
+      tCapt: sd.tCapt,
+      ldg: sd.ldg,
+      nm: sd.NM,
+      id: sd.id
     }
   })
 );
 
-const getSaciCompareData = (saci: TData): TCompare[] => (
-  saci.data.map(sd => {
-    const date = dayjs(sd[0], 'D/M/YYYY').toDate();
-    const canac = getCanacSaci(sd[3]);
-    const mat = sd[1].replace('-', '').trim();
-    const tDay = saciTimeToDecimal(sd[9]);
-    const tNight = saciTimeToDecimal(sd[10]);
-    const tNav = saciTimeToDecimal(sd[11]);
-    const ldg = Number(sd[4]);
+const getSaciCompareData = (saci: SACIData[]): TCompare[] => (
+  saci.map(sd => {
     return {
-      date,
-      canac,
-      mat,
-      tDay,
-      tNight,
-      tNav,
-      ldg,
-      id: sd[sd.length - 1]
+      date: dayjs(sd.date, 'D/M/YYYY').toDate(),
+      canac: sd.studentCanac,
+      dep: sd.dep,
+      arr: sd.arr,
+      mat: sd.acft,
+      tTotal: sd.tTotal,
+      tDay: sd.tDay,
+      tNight: sd.tNight,
+      tNav: sd.tNav,
+      tIFR: sd.tIFR,
+      tCapt: sd.tCapt,
+      ldg: sd.ldg,
+      nm: sd.NM,
+      id: sd.id
     }
   })
 )
@@ -121,7 +107,7 @@ const checkIfAllFlightsAreRegistered = (saasDayData: TCompare[], saciDayData: TC
 }
 
 
-export const compareData = (saci: TData, saas: TData) => {
+export const compareData = (saci: SACIData[], saas: SAASData[]) => {
   const saasCData = getSaasCompareData(saas);
   const saciCData = getSaciCompareData(saci);
 

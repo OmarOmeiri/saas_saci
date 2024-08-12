@@ -79,3 +79,18 @@ export const download = (str: string, name: string) => {
 export function rmvObjDuplicatesByKey<T extends Record<string, unknown>[]>(objArr: T, key: string): T {
   return uniqBy(objArr, key) as unknown as T;
 }
+
+export function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text);
+
+  // // Alert the copied text
+  // alert("Copied the text: " + copyText.value);
+}
+
+export function parentByTag(el: HTMLElement, tagName: string) {
+  if(!el || el.tagName == tagName.toUpperCase()) {
+      return el
+  } else {
+      return parentByTag(el.parentElement, tagName)
+  }
+}

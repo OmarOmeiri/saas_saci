@@ -60,3 +60,75 @@ const run = () => {
 }
 
 run();`;
+
+
+export const COL_ORDER: {
+  saci: (keyof SACIData)[],
+  saas: (keyof SAASData)[]
+} = {
+  saci:[
+    'date',
+    'acft',
+    'studentCanac',
+    'dep',
+    'arr',
+    'tTotal',
+    'tDay',
+    'tNight',
+    'tNav',
+    'tIFR',
+    'tCapt',
+    'ldg',
+    'NM',
+    'func',
+    'obs',
+    'status',
+    'reg',
+    'exclusionDate',
+    'excludedBy',
+    'id',
+  ],
+  saas: [
+    'date',
+    'acft',
+    'crew',
+    'studentCanac',
+    'dep',
+    'arr',
+    'tTotal',
+    'tDay',
+    'tNight',
+    'tNav',
+    'tIFR',
+    'tCapt',
+    'ldg',
+    'NM',
+    'id',
+  ]
+};
+
+export const COLMAP_NAMES: {
+  [K in keyof (SACIData & SAASData)]: string
+} = {
+  id: 'id',
+  date: 'Data',
+  acft: 'ACFT',
+  crew: 'Tripulante',
+  studentCanac: 'CANAC',
+  dep: 'Origem',
+  arr: 'Destino',
+  tTotal: 'Total',
+  tDay: 'DIU',
+  tNight: 'NOT',
+  tNav: 'NAV',
+  tIFR: 'INST',
+  tCapt: 'CAPT',
+  ldg: 'Pousos',
+  NM: 'Milhas',
+  func: 'Função',
+  obs: 'OBS',
+  status: 'Status',
+  reg: 'Cadastrado',
+  exclusionDate: 'Exclusão',
+  excludedBy: 'Excluido por',
+}

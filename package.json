@@ -34,6 +34,7 @@
     "dayjs": "^1.11.12",
     "lodash": "^4.17.21",
     "papaparse": "^5.4.1",
+    "toastmaker": "^1.0.9",
     "uniqid": "^5.4.0"
   }
 }

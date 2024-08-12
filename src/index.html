@@ -21,8 +21,9 @@
     </div>
     <div class="compare">
       <button id="compare-btn">Comparar</button>
+      <button id="compare-selection-btn" style="display: none;">Comparar Seleção</button>
       <button id="export-students-btn">Exportar não cadastrados</button>
-      <button id="download-saas-btn">Baixar código SAAS</button>
+      <button id="download-saas-btn">Copiar código SAAS</button>
     </div>
     <div class="saci">
       <h2>SACI</h2>
@@ -35,6 +36,14 @@
       </div>
     </div>
   </div>
+  <dialog id="favDialog">
+    <form method="dialog">
+      <div id="dialog-content"></div>
+      <div style="margin-top: 1rem;display: flex;justify-content: flex-end;">
+        <button id="close-dialog-btn" type="reset">OK</button>
+      </div>
+    </form>
+  </dialog>
 </body>
 
 </html>

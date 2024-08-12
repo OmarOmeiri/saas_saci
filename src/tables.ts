@@ -1,28 +1,61 @@
-import { TData } from ".";
+import { COL_ORDER, COLMAP_NAMES } from "./consts";
+import { parentByTag } from "./utils";
 
-export const makeTable = (data: TData, id: string) => {
+
+
+const onTRClick = (e: MouseEvent) => {
+  const target = e.target as HTMLElement;
+  const parentTable = parentByTag(target, 'table');
+  if (!parentTable) return;
+  const highlights = Array.from(parentTable.querySelectorAll('.highlight-tr'));
+  for (const highlight of highlights) {
+    highlight.classList.remove('highlight-tr');
+  }
+  if (target.tagName === 'TR') {
+    target.classList.add('highlight-tr')
+  }
+  const row = target.closest("tr");
+  if (!row) return;
+  row.classList.add('highlight-tr');
+}
+
+export function makeTable(data: SACIData[], id: 'saci-tbl'): void
+export function makeTable(data: SAASData[], id: 'saas-tbl'): void
+export function makeTable(data: SACIData[] | SAASData[], id: 'saci-tbl' | 'saas-tbl'): void {
   const tbl = document.getElementById(id);
   const thead = tbl.querySelector("thead");
   const tbody = tbl.querySelector("tbody");
-  
-
-  const idIndex = data.header.findIndex((v) => v === 'id')
 
   const theadTr = document.createElement('tr');
-  data.header.forEach((d) => {
+  (
+    id === 'saas-tbl'
+    ? COL_ORDER.saas
+    : COL_ORDER.saci
+  ).forEach((key) => {
     const th = document.createElement('th');
-    th.innerText = d;
+    th.innerText = COLMAP_NAMES[key];
     theadTr.appendChild(th);
   });
   thead.replaceChildren(theadTr);
 
-  const rows = data.data.map(d => {
+  const rows = data.map(d => {
     const tr = document.createElement('tr');
-    d.forEach((el, i) => {
-      const td = document.createElement('td');
-      td.innerText = el;
-      tr.appendChild(td);
-      if (i === idIndex) tr.id = el;
+    tr.addEventListener('click', onTRClick);
+    (
+      id === 'saas-tbl'
+      ? COL_ORDER.saas
+      : COL_ORDER.saci
+    ).forEach((key) => {
+      if (key in d) {
+        const td = document.createElement('td');
+        const tdDiv = document.createElement('div');
+        tdDiv.classList.add('td-div')
+        //@ts-expect-error kjskdj
+        tdDiv.innerText = d[key];
+        td.appendChild(tdDiv);
+        tr.appendChild(td);
+        tr.id = d.id;
+      }
     })
     return tr;
   });
@@ -30,3 +63,4 @@ export const makeTable = (data: TData, id: string) => {
   tbody.replaceChildren(...rows);
 
 }
+

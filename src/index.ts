@@ -1,15 +1,18 @@
 import './app.css';
+import "toastmaker/dist/toastmaker.css";
 import { makeTable } from './tables'
 import { saasToData, saciToData } from './data';
 import { compareData } from './compare';
 import { getNotRegisteredStudents } from './export';
-import { download } from './utils';
+import { copyToClipboard, download } from './utils';
 import { SAAS_CODE } from './consts';
+import { showToast } from './toast';
+import { makeCompareSelectionTable } from './selectionTable';
 
-export type TData = {header: string[], data: string[][]}
 
-let saci: TData
-let saas: TData
+
+let saci: SACIData[];
+let saas: SAASData[];
 
 function main(): void {
     const upldSaasBtn = document.querySelector("#upld-saas");
@@ -17,12 +20,51 @@ function main(): void {
     const compareBtn = document.querySelector("#compare-btn");
     const exportBtn = document.querySelector("#export-students-btn");
     const downloadSAASCodeBtn = document.querySelector("#download-saas-btn");
+    const compareSelectionBtn = document.querySelector("#compare-selection-btn");
+    const closeDialogBtn = document.querySelector("#close-dialog-btn");
+    
     
     upldSaasBtn?.addEventListener("click", updlSaasBtnHandler);
     upldSaciBtn?.addEventListener("click", updlSaciBtnHandler);
     compareBtn?.addEventListener("click", compareBtnHandler);
     exportBtn?.addEventListener("click", exportStudentsBtnHandler);
     downloadSAASCodeBtn?.addEventListener("click", downloadSAASCodeBtnHandler);
+    compareSelectionBtn?.addEventListener("click", compareSelectionBtnHandler);
+    closeDialogBtn?.addEventListener("click", closeDialogBtnHandler);
+    document.addEventListener('click', onDocumentClickHandler)
+}
+
+function onDocumentClickHandler() {
+  const compareSelectionBtn = document.getElementById('compare-selection-btn');
+  const highlights = document.getElementsByClassName('highlight-tr');
+  if (highlights.length === 2) {
+    compareSelectionBtn.style.removeProperty('display');
+  } else {
+    compareSelectionBtn.style.display = 'none';
+  }
+}
+
+function compareSelectionBtnHandler() {
+  const dialog = document.getElementById("favDialog") as HTMLDialogElement;
+  if (!dialog) return;
+  if (dialog.open) {
+    return;
+  }
+  const dialogContent = dialog.querySelector('#dialog-content');
+  const compareTable = makeCompareSelectionTable();
+  dialogContent.replaceChildren(...[compareTable]);
+
+  dialog.showModal();
+}
+
+function closeDialogBtnHandler() {
+  const dialog = document.getElementById("favDialog") as HTMLDialogElement;
+  if (!dialog) return;
+  if (dialog.open) {
+    dialog.close();
+    const dialogContent = dialog.querySelector('#dialog-content');
+    dialogContent.replaceChildren();
+  }
 }
 
 function updlSaciBtnHandler(e: MouseEvent): void {
@@ -56,7 +98,8 @@ function updlSaasBtnHandler(e: MouseEvent): void {
 
 function downloadSAASCodeBtnHandler(e: MouseEvent): void {
   e.preventDefault();
-  download(SAAS_CODE, 'saas_code.txt');
+  copyToClipboard(SAAS_CODE);
+  showToast('Códido copiado!');
 }
 
 function divergentTrMouseEnterHandler(e: MouseEvent): void {
@@ -101,7 +144,6 @@ function hasDataCheck(which: 'full' | 'saci' | 'saas' = 'full') {
 
 function exportStudentsBtnHandler() {
   if (!hasDataCheck()) return;
-
   const notRegistered = getNotRegisteredStudents(saci, saas)
   download(notRegistered, 'alunos_n_registrados.csv');
 }
