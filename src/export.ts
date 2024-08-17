@@ -3,7 +3,7 @@ import { jsonToCSV } from "./CSV";
 
 const getStudentNameFromSaas = (canac: string, saas: SAASData[]) => {
   const student = saas.find((d) => d.studentCanac === canac)
-  return student.crew || '-'
+  return student ? student.crew || '-' : '-'
 }
 
 export const getNotRegisteredStudents = (saci: SACIData[], saas: SAASData[]) => {

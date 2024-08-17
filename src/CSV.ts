@@ -1,5 +1,7 @@
 import Papa from 'papaparse';
 
+const universalBOM = "\uFEFF";
+
 export const csvToArray = async (csv: string): Promise<string[][]> => {
   let results: string[][] = [];
 
@@ -16,5 +18,5 @@ export const csvToArray = async (csv: string): Promise<string[][]> => {
 
 export const jsonToCSV = (json: Record<PropertyKey, unknown>[]): string => {
   const csv = Papa.unparse(json);
-  return csv
+  return `${universalBOM}${csv}`
 };

@@ -23,6 +23,21 @@ tbody tr:nth-child(odd) {
   background-color: #e6e6e6;
 }
 
+.menu-saas {
+  margin-left: -10px;
+}
+
+.menu-saci {
+  margin-right: -10px;
+}
+
+.menu-saas,
+.menu-saci {
+  border: 1px solid rgb(211, 211, 211);
+  border-radius: 5px;
+  padding: 1rem;
+}
+
 .saas,
 .saci {
   width: calc(50% - 65px);

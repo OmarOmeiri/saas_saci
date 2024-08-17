@@ -81,30 +81,30 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
       NM: Number(d[13]),
     }));
   }
-
-  return data.data.map((d) => ({
+  return data.data.map((d) => {
+    return {
     id: d[d.length - 1],
     date: d[0],
     acft: d[1],
-    crew: d[3],
-    studentCanac: getCanacSaci(d[3]),
-    dep: d[5],
-    arr: d[6],
-    tTotal: saciTimeToDecimal(d[9]) + saciTimeToDecimal(d[10]),
-    tDay: saciTimeToDecimal(d[9]),
-    tNight: saciTimeToDecimal(d[10]),
-    tNav: saciTimeToDecimal(d[11]),
-    tIFR: saciTimeToDecimal(d[12]),
-    tCapt: saciTimeToDecimal(d[13]),
-    ldg: Number(d[4]),
-    NM: Number(d[15]),
-    func: d[8],
-    obs: d[7],
-    status: d[17],
-    reg: d[18],
-    exclusionDate: d[19],
-    excludedBy: d[20]
-  }));
+    crew: d[4],
+    studentCanac: getCanacSaci(d[4]),
+    dep: d[6],
+    arr: d[7],
+    tTotal: saciTimeToDecimal(d[10]) + saciTimeToDecimal(d[11]),
+    tDay: saciTimeToDecimal(d[10]),
+    tNight: saciTimeToDecimal(d[11]),
+    tNav: saciTimeToDecimal(d[12]),
+    tIFR: saciTimeToDecimal(d[13]),
+    tCapt: saciTimeToDecimal(d[14]),
+    ldg: Number(d[5]),
+    NM: Number(d[16].replace(',', '.').trim()),
+    func: d[9].trim(),
+    obs: d[8].trim(),
+    status: d[18].trim(),
+    reg: d[19].trim(),
+    exclusionDate: d[20].trim(),
+    excludedBy: d[21].trim()
+  }});
 }
 
 
