@@ -32,9 +32,11 @@
   },
   "dependencies": {
     "dayjs": "^1.11.12",
+    "jszip": "^3.10.1",
     "lodash": "^4.17.21",
     "papaparse": "^5.4.1",
     "toastmaker": "^1.0.9",
-    "uniqid": "^5.4.0"
+    "uniqid": "^5.4.0",
+    "write-excel-file": "^2.0.6"
   }
 }

@@ -142,10 +142,10 @@ function hasDataCheck(which: 'full' | 'saci' | 'saas' = 'full') {
   return true;
 }
 
-function exportStudentsBtnHandler() {
+async function exportStudentsBtnHandler() {
   if (!hasDataCheck()) return;
-  const notRegistered = getNotRegisteredStudents(saci, saas)
-  download(notRegistered, 'alunos_n_registrados.csv');
+  const notRegistered = await getNotRegisteredStudents(saci, saas)
+  download(notRegistered, 'alunos_n_registrados.xlsx');
 }
 
 function compareBtnHandler() {

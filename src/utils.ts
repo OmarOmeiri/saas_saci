@@ -62,9 +62,11 @@ export const saciTimeToDecimal = (str: string) => {
 }
 
 
-export const download = (str: string, name: string) => {
+export const download = (data: string | Blob, name: string) => {
   const tempLink = document.createElement("a");
-  const taBlob = new Blob([str], {type: 'text/plain; charset=UTF8'});
+  const taBlob = typeof data === 'string'
+    ? new Blob([data], {type: 'text/plain; charset=UTF8'})
+    : data;
   tempLink.setAttribute('href', URL.createObjectURL(taBlob));
   tempLink.setAttribute('download', name);
   tempLink.click();
