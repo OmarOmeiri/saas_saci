@@ -1,7 +1,12 @@
+import { isDate } from "lodash";
 import { COL_ORDER, COLMAP_NAMES } from "./consts";
 import { parentByTag } from "./utils";
+import dayjs from "dayjs";
 
-
+const toString = (d: unknown) => {
+  if (isDate(d)) return dayjs(d).format('DD/MM/YYYY');
+  return d;
+}
 
 const onTRClick = (e: MouseEvent) => {
   const target = e.target as HTMLElement;
@@ -51,7 +56,7 @@ export function makeTable(data: SACIData[] | SAASData[], id: 'saci-tbl' | 'saas-
         const tdDiv = document.createElement('div');
         tdDiv.classList.add('td-div')
         //@ts-expect-error kjskdj
-        tdDiv.innerText = d[key];
+        tdDiv.innerText = toString(d[key]);
         td.appendChild(tdDiv);
         tr.appendChild(td);
         tr.id = d.id;

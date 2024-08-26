@@ -2,6 +2,7 @@ import uniqid from 'uniqid';
 import { csvToArray } from './CSV';
 import { saciTimeToDecimal, strIsDate } from './utils';
 import dayjs from 'dayjs';
+import { groupBy } from 'lodash';
 
 const getCanacSaas = (str: string) => {
   try {
@@ -65,7 +66,7 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
   if (type === 'saas') {
     return data.data.map((d) => ({
       id: d[d.length - 1],
-      date: d[1],
+      date: dayjs(d[1], 'DD/MM/YYYY').toDate(),
       acft: d[4].replace('-', '').trim(),
       crew: d[2].replace(/\(\d+\)/, '').trim(),
       studentCanac: getCanacSaas(d[2]),
@@ -84,7 +85,7 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
   return data.data.map((d) => {
     return {
     id: d[d.length - 1],
-    date: d[0],
+    date: dayjs(d[0], 'D/M/YYYY').toDate(),
     acft: d[1],
     crew: d[4],
     studentCanac: getCanacSaci(d[4]),
@@ -127,4 +128,55 @@ export const saasToData = (saas: string): SAASData[] => {
 export const saciToData = async (saci: string, excel: boolean): Promise<SACIData[]> => {
   if (!excel) return toJson(await saciCSVToData(saci), 'saci');
   return toJson(await saciXLTToData(saci), 'saci')
+}
+
+const groupString = (d1: string, d2: string) => {
+  if (d1 === d2) return d1;
+  return `${d1},${d2}`
+}
+
+const groupNav = (d: SACIData[]) => {
+  return d.reduce((g, v) => {
+    if (!g) return v;
+    return {
+      id: uniqid(),
+      date: g.date,
+      acft: g.acft,
+      crew: g.crew,
+      studentCanac: g.studentCanac,
+      dep: `${g.dep},${v.dep}`,
+      arr: `${g.arr},${v.arr}`,
+      tTotal: g.tTotal + v.tTotal,
+      tDay: g.tDay + v.tDay,
+      tNight: g.tNight + v.tNight,
+      tNav: g.tNav + v.tNav,
+      tIFR: g.tIFR + v.tIFR,
+      tCapt: g.tCapt + v.tCapt,
+      ldg: g.ldg + v.ldg,
+      NM: g.NM + v.NM,
+      func: groupString(g.func, v.func),
+      obs: groupString(g.obs, v.obs),
+      status: groupString(g.status, v.status),
+      reg: groupString(g.reg, v.reg),
+      exclusionDate: groupString(g.exclusionDate, v.exclusionDate),
+      excludedBy: groupString(g.excludedBy, v.excludedBy),
+    }
+  }, null as SACIData | null)
+}
+
+
+export const groupNavSaci = (saci: SACIData[]): SACIData[] => {
+  const groupedData: SACIData[] = [];
+  const grpObject = groupBy(saci, (d) => `${dayjs(d.date).format('DD/MM/YYYY')}-${d.studentCanac}-${d.acft}`);
+
+  for (const dayValues of Object.values(grpObject)) {
+    const toSum: SACIData[] = [];
+    for (const value of dayValues) {
+      if (value.arr === value.dep) groupedData.push(value);
+      else toSum.push(value);
+    }
+    if (toSum.length) groupedData.push(groupNav(toSum));
+  }
+  console.log('groupedData: ', groupedData);
+  return groupedData
 }

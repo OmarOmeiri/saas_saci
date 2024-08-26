@@ -173,7 +173,7 @@ td:last-child {
 
 .selection-comp-table {
   display: grid;
-  grid-template-columns: 100px 100px 100px;
+  grid-template-columns: 100px 150px 150px;
 }
 
 .selection-comp-table div {

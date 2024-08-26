@@ -2,7 +2,7 @@ type TCSVData = {header: string[], data: string[][]}
 
 type SAASData = {
   id: string;
-  date: string;
+  date: Date;
   acft: string;
   crew: string;
   studentCanac: string;
@@ -20,7 +20,7 @@ type SAASData = {
 
 type SACIData = {
   id: string;
-  date: string;
+  date: Date;
   acft: string;
   crew: string;
   studentCanac: string;

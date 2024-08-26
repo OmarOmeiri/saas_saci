@@ -1,7 +1,7 @@
 import './app.css';
 import "toastmaker/dist/toastmaker.css";
 import { makeTable } from './tables'
-import { saasToData, saciToData } from './data';
+import { groupNavSaci, saasToData, saciToData } from './data';
 import { compareData } from './compare';
 import { getNotRegisteredStudents } from './export';
 import { copyToClipboard, download } from './utils';
@@ -11,19 +11,20 @@ import { makeCompareSelectionTable } from './selectionTable';
 
 
 
+let saciOriginal: SACIData[];
 let saci: SACIData[];
 let saas: SAASData[];
 
+const upldSaasBtn = document.querySelector("#upld-saas");
+const upldSaciBtn = document.querySelector("#upld-saci");
+const compareBtn = document.querySelector("#compare-btn");
+const exportBtn = document.querySelector("#export-students-btn");
+const downloadSAASCodeBtn = document.querySelector("#download-saas-btn");
+const compareSelectionBtn = document.querySelector("#compare-selection-btn");
+const closeDialogBtn = document.querySelector("#close-dialog-btn");
+const groupNavCheckbox = document.querySelector("#group-nav-checkbox");
+
 function main(): void {
-    const upldSaasBtn = document.querySelector("#upld-saas");
-    const upldSaciBtn = document.querySelector("#upld-saci");
-    const compareBtn = document.querySelector("#compare-btn");
-    const exportBtn = document.querySelector("#export-students-btn");
-    const downloadSAASCodeBtn = document.querySelector("#download-saas-btn");
-    const compareSelectionBtn = document.querySelector("#compare-selection-btn");
-    const closeDialogBtn = document.querySelector("#close-dialog-btn");
-    
-    
     upldSaasBtn?.addEventListener("click", updlSaasBtnHandler);
     upldSaciBtn?.addEventListener("click", updlSaciBtnHandler);
     compareBtn?.addEventListener("click", compareBtnHandler);
@@ -31,6 +32,7 @@ function main(): void {
     downloadSAASCodeBtn?.addEventListener("click", downloadSAASCodeBtnHandler);
     compareSelectionBtn?.addEventListener("click", compareSelectionBtnHandler);
     closeDialogBtn?.addEventListener("click", closeDialogBtnHandler);
+    groupNavCheckbox?.addEventListener("change", groupNavHandler);
     document.addEventListener('click', onDocumentClickHandler)
 }
 
@@ -42,6 +44,9 @@ function onDocumentClickHandler() {
   } else {
     compareSelectionBtn.style.display = 'none';
   }
+
+  if (saci) groupNavCheckbox.removeAttribute('disabled');
+  else groupNavCheckbox.setAttribute('disabled', 'true');
 }
 
 function compareSelectionBtnHandler() {
@@ -79,6 +84,8 @@ function updlSaciBtnHandler(e: MouseEvent): void {
     const data = await saciToData(decoded, file.name.endsWith('.xlt'));
     makeTable(data, 'saci-tbl');
     saci = data;
+    saciOriginal = [...data];
+    groupNavCheckbox.removeAttribute('disabled');
   };
   input.click();
 }
@@ -144,12 +151,26 @@ function hasDataCheck(which: 'full' | 'saci' | 'saas' = 'full') {
 
 async function exportStudentsBtnHandler() {
   if (!hasDataCheck()) return;
-  const notRegistered = await getNotRegisteredStudents(saci, saas)
+  const notRegistered = await getNotRegisteredStudents(saciOriginal, saas)
   download(notRegistered, 'alunos_n_registrados.xlsx');
+}
+
+function groupNavHandler(e: Event) {
+  const target = e.target as HTMLInputElement;
+  if (target.checked) {
+    saci = groupNavSaci(saci);
+  } else {
+    saci = [...saciOriginal];
+  }
+  makeTable(saci, 'saci-tbl');
+  compareBtnHandler();
 }
 
 function compareBtnHandler() {
   if (!hasDataCheck()) return;
+
+  Array.from(document.querySelectorAll('.divergent-tr'))
+  .forEach((el) => el.classList.remove('divergent-tr'));
 
   const divergentIds = compareData(saci, saas);
   if (!divergentIds.length) {

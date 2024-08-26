@@ -34,8 +34,8 @@ const getSaasCompareData = (saas: SAASData[]) => (
     return {
       date: dayjs(sd.date, 'DD/MM/YYYY').toDate(),
       canac: sd.studentCanac,
-      dep: sd.dep,
-      arr: sd.arr,
+      dep: sd.dep.split(',').length > 1 ? sd.dep.split(',').sort().join(',') : sd.dep,
+      arr: sd.arr.split(',').length > 1 ? sd.arr.split(',').sort().join(',') : sd.arr,
       mat: sd.acft,
       tTotal: sd.tTotal,
       tDay: sd.tDay,
@@ -55,8 +55,8 @@ const getSaciCompareData = (saci: SACIData[]): TCompare[] => (
     return {
       date: dayjs(sd.date, 'D/M/YYYY').toDate(),
       canac: sd.studentCanac,
-      dep: sd.dep,
-      arr: sd.arr,
+      dep: sd.dep.split(',').length > 1 ? sd.dep.split(',').sort().join(',') : sd.dep,
+      arr: sd.arr.split(',').length > 1 ? sd.arr.split(',').sort().join(',') : sd.arr,
       mat: sd.acft,
       tTotal: sd.tTotal,
       tDay: sd.tDay,
@@ -80,6 +80,8 @@ const checkDateDivergences = (saasDayData: TCompare[], saciDayData: TCompare[]) 
     return divergIds;
   }, [] as TDivergence[])
 };
+
+
 
 const checkIfAllFlightsAreRegistered = (saasDayData: TCompare[], saciDayData: TCompare[]): {notFoundIds: string[], divergences: TDivergence[]} => {
   const foundSaciIds: Set<string> = new Set();
