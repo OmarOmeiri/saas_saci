@@ -22,12 +22,14 @@ const exportBtn = document.querySelector("#export-students-btn");
 const downloadSAASCodeBtn = document.querySelector("#download-saas-btn");
 const compareSelectionBtn = document.querySelector("#compare-selection-btn");
 const closeDialogBtn = document.querySelector("#close-dialog-btn");
-const groupNavCheckbox = document.querySelector("#group-nav-checkbox");
+const groupNavCheckbox = document.querySelector("#group-nav-checkbox") as HTMLInputElement;
+const saasDataCount = (document.querySelector('.menu-saas small') as HTMLElement | null);
+const saciDataCount = (document.querySelector('.menu-saci small') as HTMLElement | null);
 
 function main(): void {
     upldSaasBtn?.addEventListener("click", updlSaasBtnHandler);
     upldSaciBtn?.addEventListener("click", updlSaciBtnHandler);
-    compareBtn?.addEventListener("click", compareBtnHandler);
+    compareBtn?.addEventListener("click", () => compareBtnHandler());
     exportBtn?.addEventListener("click", exportStudentsBtnHandler);
     downloadSAASCodeBtn?.addEventListener("click", downloadSAASCodeBtnHandler);
     compareSelectionBtn?.addEventListener("click", compareSelectionBtnHandler);
@@ -86,6 +88,8 @@ function updlSaciBtnHandler(e: MouseEvent): void {
     saci = data;
     saciOriginal = [...data];
     groupNavCheckbox.removeAttribute('disabled');
+    groupNavCheckbox.checked = false;
+    if (saciDataCount) saciDataCount.innerText = `${saci.length} itens`
   };
   input.click();
 }
@@ -99,6 +103,7 @@ function updlSaasBtnHandler(e: MouseEvent): void {
     const data = saasToData(await (event.target as HTMLInputElement ).files.item(0).text());
     makeTable(data, 'saas-tbl');
     saas = data;
+    if (saasDataCount) saasDataCount.innerText = `${saas.length} itens`
   };
   input.click();
 }
@@ -133,17 +138,17 @@ function divergentTrMouseLeaveHandler(e: MouseEvent): void {
   }
 }
 
-function hasDataCheck(which: 'full' | 'saci' | 'saas' = 'full') {
+function hasDataCheck(which: 'full' | 'saci' | 'saas' = 'full', silent = false) {
   if (which === 'full' && !saas && !saci) {
-    alert(`Faça o upload dos dados.`);
+    if (!silent) alert(`Faça o upload dos dados.`);
     return false;
   }
   if ((which === 'full' || which === 'saas') && !saas) {
-    alert(`Faça o upload dos dados do SAAS.`);
+    if (!silent) alert(`Faça o upload dos dados do SAAS.`);
     return false;
   }
   if ((which === 'full' || which === 'saci') && !saci) {
-    alert(`Faça o upload dos dados do SACI.`);
+    if (!silent) alert(`Faça o upload dos dados do SACI.`);
     return false;
   }
   return true;
@@ -162,12 +167,13 @@ function groupNavHandler(e: Event) {
   } else {
     saci = [...saciOriginal];
   }
+  if (saciDataCount) saciDataCount.innerText = `${saci.length} itens`
   makeTable(saci, 'saci-tbl');
-  compareBtnHandler();
+  compareBtnHandler(true);
 }
 
-function compareBtnHandler() {
-  if (!hasDataCheck()) return;
+function compareBtnHandler(silentDataCheck = false) {
+  if (!hasDataCheck('full', silentDataCheck)) return;
 
   Array.from(document.querySelectorAll('.divergent-tr'))
   .forEach((el) => el.classList.remove('divergent-tr'));

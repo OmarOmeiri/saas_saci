@@ -31,11 +31,20 @@ tbody tr:nth-child(odd) {
   margin-right: -10px;
 }
 
+.title-container {
+  margin: 1rem 0;
+}
+
 .menu-saas,
 .menu-saci {
   border: 1px solid rgb(211, 211, 211);
   border-radius: 5px;
   padding: 1rem;
+}
+
+.menu-saas h2,
+.menu-saci h2 {
+  display: inline;
 }
 
 .saas,
