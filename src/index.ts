@@ -23,8 +23,9 @@ const downloadSAASCodeBtn = document.querySelector("#download-saas-btn");
 const compareSelectionBtn = document.querySelector("#compare-selection-btn");
 const closeDialogBtn = document.querySelector("#close-dialog-btn");
 const groupNavCheckbox = document.querySelector("#group-nav-checkbox") as HTMLInputElement;
-const saasDataCount = (document.querySelector('.menu-saas small') as HTMLElement | null);
+const saasDataCount = (document.querySelector('.menu-saas small span:nth-child(1)') as HTMLElement | null);
 const saciDataCount = (document.querySelector('.menu-saci small') as HTMLElement | null);
+const saciDataCountDiverg = (document.querySelector('.menu-saas small span:nth-child(2)') as HTMLElement | null);
 
 function main(): void {
     upldSaasBtn?.addEventListener("click", updlSaasBtnHandler);
@@ -104,6 +105,7 @@ function updlSaasBtnHandler(e: MouseEvent): void {
     makeTable(data, 'saas-tbl');
     saas = data;
     if (saasDataCount) saasDataCount.innerText = `${saas.length} itens`
+    setDivergenceCount(null);
   };
   input.click();
 }
@@ -172,6 +174,17 @@ function groupNavHandler(e: Event) {
   compareBtnHandler(true);
 }
 
+function setDivergenceCount(n: number | null) {
+  if (n === null) {
+    saciDataCountDiverg.innerText = '';
+    saciDataCountDiverg.style.removeProperty('color');
+  }
+  else {
+    saciDataCountDiverg.innerText = ` (${n} divergências)`;
+    saciDataCountDiverg.style.color = n > 0 ? 'red' : '#44c344';
+  }
+}
+
 function compareBtnHandler(silentDataCheck = false) {
   if (!hasDataCheck('full', silentDataCheck)) return;
 
@@ -182,9 +195,11 @@ function compareBtnHandler(silentDataCheck = false) {
   if (!divergentIds.length) {
     Array.from(document.querySelectorAll('#saas-tbl tr'))
       .forEach((tr) => tr.classList.remove('divergent-tr'))
-
-    alert('Parabéns! nenhuma divergência foi encontrada.');
+    setDivergenceCount(0);
+    return
   }
+  
+  setDivergenceCount(divergentIds.length);
   for (const divergentId of divergentIds) {
     const divergentTr = document.getElementById(divergentId.id);
     if (!divergentTr) {

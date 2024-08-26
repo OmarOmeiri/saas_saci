@@ -2,7 +2,7 @@ import uniqid from 'uniqid';
 import { csvToArray } from './CSV';
 import { saciTimeToDecimal, strIsDate } from './utils';
 import dayjs from 'dayjs';
-import { groupBy } from 'lodash';
+import { groupBy, round } from 'lodash';
 
 const getCanacSaas = (str: string) => {
   try {
@@ -146,14 +146,14 @@ const groupNav = (d: SACIData[]) => {
       studentCanac: g.studentCanac,
       dep: `${g.dep},${v.dep}`,
       arr: `${g.arr},${v.arr}`,
-      tTotal: g.tTotal + v.tTotal,
-      tDay: g.tDay + v.tDay,
-      tNight: g.tNight + v.tNight,
-      tNav: g.tNav + v.tNav,
-      tIFR: g.tIFR + v.tIFR,
-      tCapt: g.tCapt + v.tCapt,
+      tTotal: round(g.tTotal + v.tTotal, 1),
+      tDay: round(g.tDay + v.tDay, 1),
+      tNight: round(g.tNight + v.tNight, 1),
+      tNav: round(g.tNav + v.tNav, 1),
+      tIFR: round(g.tIFR + v.tIFR, 1),
+      tCapt: round(g.tCapt + v.tCapt, 1),
       ldg: g.ldg + v.ldg,
-      NM: g.NM + v.NM,
+      NM: round(g.NM + v.NM, 1),
       func: groupString(g.func, v.func),
       obs: groupString(g.obs, v.obs),
       status: groupString(g.status, v.status),

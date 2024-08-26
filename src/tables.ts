@@ -3,9 +3,11 @@ import { COL_ORDER, COLMAP_NAMES } from "./consts";
 import { parentByTag } from "./utils";
 import dayjs from "dayjs";
 
+const isNav = (depArr: string) => (depArr.split(',').length > 1);
+
 const toString = (d: unknown) => {
   if (isDate(d)) return dayjs(d).format('DD/MM/YYYY');
-  return d;
+  return String(d);
 }
 
 const onTRClick = (e: MouseEvent) => {
@@ -52,11 +54,19 @@ export function makeTable(data: SACIData[] | SAASData[], id: 'saci-tbl' | 'saas-
       : COL_ORDER.saci
     ).forEach((key) => {
       if (key in d) {
+        //@ts-expect-error kjskdj
+        const value = d[key]
         const td = document.createElement('td');
         const tdDiv = document.createElement('div');
         tdDiv.classList.add('td-div')
-        //@ts-expect-error kjskdj
-        tdDiv.innerText = toString(d[key]);
+        if ((key === 'dep' || key === 'arr') && isNav(value)) {
+          const innerDiv = document.createElement('div');
+          innerDiv.classList.add('nav-item');
+          innerDiv.innerText = toString(value);
+          tdDiv.appendChild(innerDiv);
+        } else {
+          tdDiv.innerText = toString(value);
+        }
         td.appendChild(tdDiv);
         tr.appendChild(td);
         tr.id = d.id;

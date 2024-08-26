@@ -129,6 +129,11 @@ th {
   justify-content: flex-start;
 }
 
+.saci-tbl-container td:nth-child(5) div,
+.saci-tbl-container td:nth-child(4) div {
+  width: 90px;
+}
+
 table td:nth-child(-n+12):nth-child(n+7) {
   min-width: 40px;
   max-width: 40px;
@@ -146,6 +151,11 @@ td:last-child {
 .highlight-tr {
   background: #1a41a6 !important;
   color: white;
+}
+.nav-item {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* TOOLTIP */
