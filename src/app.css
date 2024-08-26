@@ -54,8 +54,8 @@ tbody tr:nth-child(odd) {
 .saas,
 .saci {
   width: calc(50% - 65px);
-  margin-left: 10px;
-  margin-right: 10px;
+  /* margin-left: 10px;
+  margin-right: 10px; */
 }
 
 .compare {
