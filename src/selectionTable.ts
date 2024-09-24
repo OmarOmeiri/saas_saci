@@ -26,7 +26,6 @@ const makeTBody = (saasRow: HTMLTableRowElement, saciRow: HTMLTableRowElement) =
   const saasChildren = Array.from(saasRow.children) as HTMLElement[];
   const saciChildren = Array.from(saciRow.children) as HTMLElement[];
   COL_ORDER.saas.slice(0, COL_ORDER.saas.length - 1).forEach((col, i) => {
-    console.log('col: ', col);
     if (COL_ORDER.saci.indexOf(col) < 0) return;
     const name = document.createElement('div');
     name.innerText = COLMAP_NAMES[col];

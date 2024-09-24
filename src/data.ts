@@ -3,6 +3,7 @@ import { csvToArray } from './CSV';
 import { saciTimeToDecimal, strIsDate } from './utils';
 import dayjs from 'dayjs';
 import { groupBy, round } from 'lodash';
+import { COLMAP_INDEX } from './consts';
 
 const getCanacSaas = (str: string) => {
   try {
@@ -23,18 +24,23 @@ const getCanacSaci = (str: string) => {
 }
 
 
+const filterSaciData = (data: string[][]) => (
+  data.filter((d) => (
+    strIsDate(d[COLMAP_INDEX.saci.date], 'D/M/YYYY') && !d[COLMAP_INDEX.saci.status].toLowerCase().includes('exclusão')
+  ))
+);
+
 const saciCSVToData = async (saci: string): Promise<TCSVData> => {
   const arr = await csvToArray(saci);
   arr[0].push('id')
   for (let i = 1; i < arr.length; i++) {
     arr[i].push(uniqid())
   }
-  const filtered =  arr.filter((d) => strIsDate(d[0], 'D/M/YYYY'));
 
   const header = arr.shift();
   return {
     header,
-    data: filtered,
+    data: filterSaciData(arr),
   }
 }
 
@@ -52,13 +58,13 @@ const saciXLTToData = async (saci: string): Promise<TCSVData> => {
      }
   });
 
-  const filtered =  data.filter((d) => strIsDate(d[0], 'D/M/YYYY') && !d[17].toLowerCase().includes('exclusão'));
-
   return {
     header,
-    data: filtered,
+    data: filterSaciData(data),
   }
 }
+
+
 
 function toJson(data: TCSVData, type: 'saas'): SAASData[]
 function toJson(data: TCSVData, type: 'saci'): SACIData[]
@@ -66,45 +72,45 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
   if (type === 'saas') {
     return data.data.map((d) => ({
       id: d[d.length - 1],
-      date: dayjs(d[1], 'DD/MM/YYYY').toDate(),
-      acft: d[4].replace('-', '').trim(),
-      crew: d[2].replace(/\(\d+\)/, '').trim(),
-      studentCanac: getCanacSaas(d[2]),
-      dep: d[5].split('-')[0].trim(),
-      arr: d[5].split('-')[1].trim(),
-      tTotal: Number(d[6]),
-      tDay: Number(d[7]),
-      tNight: Number(d[8]),
-      tNav: Number(d[9]),
-      tIFR: Number(d[10]),
-      tCapt: Number(d[11]),
-      ldg: Number(d[12]),
-      NM: Number(d[13]),
+      date: dayjs(d[COLMAP_INDEX.saas.date], 'DD/MM/YYYY').toDate(),
+      acft: d[COLMAP_INDEX.saas.acft].replace('-', '').trim(),
+      crew: d[COLMAP_INDEX.saas.crew].replace(/\(\d+\)/, '').trim(),
+      studentCanac: getCanacSaas(d[COLMAP_INDEX.saas.crew]),
+      dep: d[COLMAP_INDEX.saas.depArr].split('-')[0].trim(),
+      arr: d[COLMAP_INDEX.saas.depArr].split('-')[1].trim(),
+      tTotal: Number(d[COLMAP_INDEX.saas.tTotal]),
+      tDay: Number(d[COLMAP_INDEX.saas.tDay]),
+      tNight: Number(d[COLMAP_INDEX.saas.tNight]),
+      tNav: Number(d[COLMAP_INDEX.saas.tNav]),
+      tIFR: Number(d[COLMAP_INDEX.saas.tIFR]),
+      tCapt: Number(d[COLMAP_INDEX.saas.tCapt]),
+      ldg: Number(d[COLMAP_INDEX.saas.ldg]),
+      NM: Number(d[COLMAP_INDEX.saas.NM]),
     }));
   }
   return data.data.map((d) => {
     return {
     id: d[d.length - 1],
-    date: dayjs(d[0], 'D/M/YYYY').toDate(),
-    acft: d[1],
-    crew: d[4],
-    studentCanac: getCanacSaci(d[4]),
-    dep: d[6],
-    arr: d[7],
-    tTotal: saciTimeToDecimal(d[10]) + saciTimeToDecimal(d[11]),
-    tDay: saciTimeToDecimal(d[10]),
-    tNight: saciTimeToDecimal(d[11]),
-    tNav: saciTimeToDecimal(d[12]),
-    tIFR: saciTimeToDecimal(d[13]),
-    tCapt: saciTimeToDecimal(d[14]),
-    ldg: Number(d[5]),
-    NM: Number(d[16].replace(',', '.').trim()),
-    func: d[9].trim(),
-    obs: d[8].trim(),
-    status: d[18].trim(),
-    reg: d[19].trim(),
-    exclusionDate: d[20].trim(),
-    excludedBy: d[21].trim()
+    date: dayjs(d[COLMAP_INDEX.saci.date], 'D/M/YYYY').toDate(),
+    acft: d[COLMAP_INDEX.saci.acft],
+    crew: d[COLMAP_INDEX.saci.crew],
+    studentCanac: getCanacSaci(d[COLMAP_INDEX.saci.crew]),
+    dep: d[COLMAP_INDEX.saci.dep],
+    arr: d[COLMAP_INDEX.saci.arr],
+    tTotal: saciTimeToDecimal(d[COLMAP_INDEX.saci.tDay]) + saciTimeToDecimal(d[COLMAP_INDEX.saci.tNight]),
+    tDay: saciTimeToDecimal(d[COLMAP_INDEX.saci.tDay]),
+    tNight: saciTimeToDecimal(d[COLMAP_INDEX.saci.tNight]),
+    tNav: saciTimeToDecimal(d[COLMAP_INDEX.saci.tNav]),
+    tIFR: saciTimeToDecimal(d[COLMAP_INDEX.saci.tIFR]),
+    tCapt: saciTimeToDecimal(d[COLMAP_INDEX.saci.tCapt]),
+    ldg: Number(d[COLMAP_INDEX.saci.ldg]),
+    NM: Number(d[COLMAP_INDEX.saci.NM].replace(',', '.').trim()),
+    func: d[COLMAP_INDEX.saci.func].trim(),
+    obs: d[COLMAP_INDEX.saci.obs].trim(),
+    status: d[COLMAP_INDEX.saci.status].trim(),
+    reg: d[COLMAP_INDEX.saci.reg].trim(),
+    exclusionDate: d[COLMAP_INDEX.saci.exclusionDate].trim(),
+    excludedBy: d[COLMAP_INDEX.saci.excludedBy].trim()
   }});
 }
 
@@ -118,7 +124,7 @@ export const saasToData = (saas: string): SAASData[] => {
   }
 
   const header = arr.shift();
-  arr.sort((a, b) => dayjs(a[1], 'DD/MM/YYYY').toDate().getTime() > dayjs(b[1], 'DD/MM/YYYY').toDate().getTime() ? -1 : 1)
+  arr.sort((a, b) => dayjs(a[COLMAP_INDEX.saas.date], 'DD/MM/YYYY').toDate().getTime() > dayjs(b[COLMAP_INDEX.saas.date], 'DD/MM/YYYY').toDate().getTime() ? -1 : 1)
   return toJson({
     header,
     data: arr,
@@ -127,7 +133,7 @@ export const saasToData = (saas: string): SAASData[] => {
 
 export const saciToData = async (saci: string, excel: boolean): Promise<SACIData[]> => {
   if (!excel) return toJson(await saciCSVToData(saci), 'saci');
-  return toJson(await saciXLTToData(saci), 'saci')
+  return toJson(await saciXLTToData(saci), 'saci');
 }
 
 const groupString = (d1: string, d2: string) => {
@@ -177,6 +183,5 @@ export const groupNavSaci = (saci: SACIData[]): SACIData[] => {
     }
     if (toSum.length) groupedData.push(groupNav(toSum));
   }
-  console.log('groupedData: ', groupedData);
   return groupedData
 }

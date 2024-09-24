@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import { groupBy, isEqual } from "lodash";
 import { arrayDiff } from "./utils";
 
@@ -32,7 +31,7 @@ const noId = (o: TCompare) => {
 const getSaasCompareData = (saas: SAASData[]) => (
   saas.map(sd => {
     return {
-      date: dayjs(sd.date, 'DD/MM/YYYY').toDate(),
+      date: sd.date,
       canac: sd.studentCanac,
       dep: sd.dep.split(',').length > 1 ? sd.dep.split(',').sort().join(',') : sd.dep,
       arr: sd.arr.split(',').length > 1 ? sd.arr.split(',').sort().join(',') : sd.arr,
@@ -53,7 +52,7 @@ const getSaasCompareData = (saas: SAASData[]) => (
 const getSaciCompareData = (saci: SACIData[]): TCompare[] => (
   saci.map(sd => {
     return {
-      date: dayjs(sd.date, 'D/M/YYYY').toDate(),
+      date: sd.date,
       canac: sd.studentCanac,
       dep: sd.dep.split(',').length > 1 ? sd.dep.split(',').sort().join(',') : sd.dep,
       arr: sd.arr.split(',').length > 1 ? sd.arr.split(',').sort().join(',') : sd.arr,
