@@ -69,7 +69,7 @@ export const COL_ORDER: {
   saci:[
     'date',
     'acft',
-    'studentCanac',
+    'canac',
     'dep',
     'arr',
     'tTotal',
@@ -79,7 +79,7 @@ export const COL_ORDER: {
     'tIFR',
     'tCapt',
     'ldg',
-    'NM',
+    'nm',
     'func',
     'obs',
     'status',
@@ -92,7 +92,7 @@ export const COL_ORDER: {
     'date',
     'acft',
     'crew',
-    'studentCanac',
+    'canac',
     'dep',
     'arr',
     'tTotal',
@@ -102,7 +102,7 @@ export const COL_ORDER: {
     'tIFR',
     'tCapt',
     'ldg',
-    'NM',
+    'nm',
     'id',
   ]
 };
@@ -114,7 +114,7 @@ export const COLMAP_NAMES: {
   date: 'Data',
   acft: 'ACFT',
   crew: 'Tripulante',
-  studentCanac: 'CANAC',
+  canac: 'CANAC',
   dep: 'Origem',
   arr: 'Destino',
   tTotal: 'Total',
@@ -124,7 +124,7 @@ export const COLMAP_NAMES: {
   tIFR: 'INST',
   tCapt: 'CAPT',
   ldg: 'Pousos',
-  NM: 'Milhas',
+  nm: 'Milhas',
   func: 'Função',
   obs: 'OBS',
   status: 'Status',
@@ -168,4 +168,24 @@ export const COLMAP_INDEX = {
     ldg: 12,
     NM: 13,
   },
+}
+
+export const CONFIG: {
+  columnsToCompare: {[K in keyof Partial<TCompare>]: boolean},
+  nmTolerance: number
+} = {
+  columnsToCompare: {
+    canac: true,
+    dep: true,
+    arr: true,
+    tTotal: true,
+    tDay: true,
+    tNight: true,
+    tNav: true,
+    tIFR: true,
+    tCapt: true,
+    ldg: true,
+    nm: true,
+  },
+  nmTolerance: 15,
 }

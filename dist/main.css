@@ -72,6 +72,10 @@ tbody tr:nth-child(odd) {
   width: 100px
 }
 
+.config-btn > *{
+  pointer-events: none;
+}
+
 /* TABLE */
 
 
@@ -214,6 +218,18 @@ td:last-child {
   background-color: #0b1641;
   color: white;
   font-weight: bold;
+}
+
+/* CONFIG DIALOG */
+
+.config-dialog-container {
+  display: grid;
+  grid-template-columns: 1fr 60px;
+  column-gap: 10px;
+}
+
+.config-dialog-container input{
+  width: 40px;
 }
 /*!
  * ToastMaker v1.0.9

@@ -1,38 +1,23 @@
 import { groupBy, isEqual } from "lodash";
 import { arrayDiff } from "./utils";
-
-type TCompare = {
-  date: Date;
-  canac: string;
-  dep: string;
-  arr: string;
-  mat: string;
-  tTotal: number;
-  tDay: number;
-  tNight: number;
-  tNav: number;
-  tIFR: number;
-  tCapt: number;
-  ldg: number;
-  nm: number;
-  id: string;
-}
+import { CONFIG } from "./consts";
 
 export type TDivergence = {id: string, msg: string}
 export type TDivergences = {id: string, msg: string[]}
 
-const noId = (o: TCompare) => {
+const noIdAndNm = (o: TCompare) => {
   const d = {...o};
   delete d.id;
+  delete d.nm;
   return d;
 }
 
 
 const getSaasCompareData = (saas: SAASData[]) => (
   saas.map(sd => {
-    return {
+    const toCompare = {
       date: sd.date,
-      canac: sd.studentCanac,
+      canac: sd.canac,
       dep: sd.dep.split(',').length > 1 ? sd.dep.split(',').sort().join(',') : sd.dep,
       arr: sd.arr.split(',').length > 1 ? sd.arr.split(',').sort().join(',') : sd.arr,
       mat: sd.acft,
@@ -43,17 +28,25 @@ const getSaasCompareData = (saas: SAASData[]) => (
       tIFR: sd.tIFR,
       tCapt: sd.tCapt,
       ldg: sd.ldg,
-      nm: sd.NM,
+      nm: sd.nm,
       id: sd.id
     }
+
+    Object.entries(CONFIG.columnsToCompare).forEach(([k, v]) => {
+      const key = k as unknown as keyof typeof toCompare;
+      if (!v) {
+        delete toCompare[key]
+      }
+    });
+    return toCompare;
   })
 );
 
 const getSaciCompareData = (saci: SACIData[]): TCompare[] => (
   saci.map(sd => {
-    return {
+    const toCompare = {
       date: sd.date,
-      canac: sd.studentCanac,
+      canac: sd.canac,
       dep: sd.dep.split(',').length > 1 ? sd.dep.split(',').sort().join(',') : sd.dep,
       arr: sd.arr.split(',').length > 1 ? sd.arr.split(',').sort().join(',') : sd.arr,
       mat: sd.acft,
@@ -64,9 +57,15 @@ const getSaciCompareData = (saci: SACIData[]): TCompare[] => (
       tIFR: sd.tIFR,
       tCapt: sd.tCapt,
       ldg: sd.ldg,
-      nm: sd.NM,
+      nm: sd.nm,
       id: sd.id
     }
+
+    Object.entries(CONFIG.columnsToCompare).forEach(([k, v]) => {
+      const key = k as unknown as keyof typeof toCompare;
+      if (!v) delete toCompare[key]
+    });
+    return toCompare;
   })
 )
 
@@ -87,10 +86,18 @@ const checkIfAllFlightsAreRegistered = (saasDayData: TCompare[], saciDayData: TC
   const foundSaasIds: Set<string> = new Set();
   const allSaasIds = saasDayData.map(d => d.id);
   for (const saasLine of saasDayData) {
-    const found = saciDayData.find((s) => (
-      isEqual(noId(s), noId(saasLine))
-      && !foundSaciIds.has(s.id)
-    ));
+    const found = saciDayData.find((s) => {
+      
+      if (
+        isEqual(noIdAndNm(s), noIdAndNm(saasLine))
+        && !foundSaciIds.has(s.id)
+      ) {
+        if (!CONFIG.columnsToCompare.nm) return true;
+        if (Math.abs(s.nm - saasLine.nm) > CONFIG.nmTolerance) return false
+        return true;
+      }
+      return false;
+    });
 
     if (found) {
       foundSaciIds.add(found.id);

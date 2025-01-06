@@ -8,6 +8,8 @@ import { copyToClipboard, download } from './utils';
 import { SAAS_CODE } from './consts';
 import { showToast } from './toast';
 import { makeCompareSelectionTable } from './selectionTable';
+import { makeConfigDialogContent } from './configDialog';
+import AttributeObserver from './AttibuteObserver';
 
 
 
@@ -21,11 +23,16 @@ const compareBtn = document.querySelector("#compare-btn");
 const exportBtn = document.querySelector("#export-students-btn");
 const downloadSAASCodeBtn = document.querySelector("#download-saas-btn");
 const compareSelectionBtn = document.querySelector("#compare-selection-btn");
+const configBtn = document.querySelector("#config-btn");
 const closeDialogBtn = document.querySelector("#close-dialog-btn");
 const groupNavCheckbox = document.querySelector("#group-nav-checkbox") as HTMLInputElement;
 const saasDataCount = (document.querySelector('.menu-saas small span:nth-child(1)') as HTMLElement | null);
 const saciDataCount = (document.querySelector('.menu-saci small') as HTMLElement | null);
 const saciDataCountDiverg = (document.querySelector('.menu-saas small span:nth-child(2)') as HTMLElement | null);
+const dialog = document.getElementById('favDialog');
+
+const dialogObserver = new AttributeObserver(dialog, onDialogAttributeChange);
+dialogObserver.observe(['data-reload', 'open']);
 
 function main(): void {
     upldSaasBtn?.addEventListener("click", updlSaasBtnHandler);
@@ -36,7 +43,18 @@ function main(): void {
     compareSelectionBtn?.addEventListener("click", compareSelectionBtnHandler);
     closeDialogBtn?.addEventListener("click", closeDialogBtnHandler);
     groupNavCheckbox?.addEventListener("change", groupNavHandler);
+    configBtn?.addEventListener("click", configBtnHandler);
     document.addEventListener('click', onDocumentClickHandler)
+}
+
+function onDialogAttributeChange(mutation: MutationRecord) {
+  const target = mutation.target as HTMLDialogElement;
+  const open = target.getAttribute('open') !== null;
+  const reload = target.getAttribute('data-reload') === 'true';
+  if (!open && reload) {
+    compareBtnHandler(true);
+    dialog.setAttribute('data-reload', 'false');
+  }
 }
 
 function onDocumentClickHandler() {
@@ -61,6 +79,19 @@ function compareSelectionBtnHandler() {
   const dialogContent = dialog.querySelector('#dialog-content');
   const compareTable = makeCompareSelectionTable();
   dialogContent.replaceChildren(...[compareTable]);
+
+  dialog.showModal();
+}
+
+function configBtnHandler(): void {
+  const dialog = document.getElementById("favDialog") as HTMLDialogElement;
+  if (!dialog) return;
+  if (dialog.open) {
+    return;
+  }
+  const dialogContent = dialog.querySelector('#dialog-content');
+  const configDialogContent = makeConfigDialogContent();
+  dialogContent.replaceChildren(...[configDialogContent]);
 
   dialog.showModal();
 }

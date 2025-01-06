@@ -75,7 +75,7 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
       date: dayjs(d[COLMAP_INDEX.saas.date], 'DD/MM/YYYY').toDate(),
       acft: d[COLMAP_INDEX.saas.acft].replace('-', '').trim(),
       crew: d[COLMAP_INDEX.saas.crew].replace(/\(\d+\)/, '').trim(),
-      studentCanac: getCanacSaas(d[COLMAP_INDEX.saas.crew]),
+      canac: getCanacSaas(d[COLMAP_INDEX.saas.crew]),
       dep: d[COLMAP_INDEX.saas.depArr].split('-')[0].trim(),
       arr: d[COLMAP_INDEX.saas.depArr].split('-')[1].trim(),
       tTotal: Number(d[COLMAP_INDEX.saas.tTotal]),
@@ -85,7 +85,7 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
       tIFR: Number(d[COLMAP_INDEX.saas.tIFR]),
       tCapt: Number(d[COLMAP_INDEX.saas.tCapt]),
       ldg: Number(d[COLMAP_INDEX.saas.ldg]),
-      NM: Number(d[COLMAP_INDEX.saas.NM]),
+      nm: Number(d[COLMAP_INDEX.saas.NM]),
     }));
   }
   return data.data.map((d) => {
@@ -94,7 +94,7 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
     date: dayjs(d[COLMAP_INDEX.saci.date], 'D/M/YYYY').toDate(),
     acft: d[COLMAP_INDEX.saci.acft],
     crew: d[COLMAP_INDEX.saci.crew],
-    studentCanac: getCanacSaci(d[COLMAP_INDEX.saci.crew]),
+    canac: getCanacSaci(d[COLMAP_INDEX.saci.crew]),
     dep: d[COLMAP_INDEX.saci.dep],
     arr: d[COLMAP_INDEX.saci.arr],
     tTotal: saciTimeToDecimal(d[COLMAP_INDEX.saci.tDay]) + saciTimeToDecimal(d[COLMAP_INDEX.saci.tNight]),
@@ -104,7 +104,7 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
     tIFR: saciTimeToDecimal(d[COLMAP_INDEX.saci.tIFR]),
     tCapt: saciTimeToDecimal(d[COLMAP_INDEX.saci.tCapt]),
     ldg: Number(d[COLMAP_INDEX.saci.ldg]),
-    NM: Number(d[COLMAP_INDEX.saci.NM].replace(',', '.').trim()),
+    nm: Number(d[COLMAP_INDEX.saci.NM].replace(',', '.').trim()),
     func: d[COLMAP_INDEX.saci.func].trim(),
     obs: d[COLMAP_INDEX.saci.obs].trim(),
     status: d[COLMAP_INDEX.saci.status].trim(),
@@ -149,7 +149,7 @@ const groupNav = (d: SACIData[]) => {
       date: g.date,
       acft: g.acft,
       crew: g.crew,
-      studentCanac: g.studentCanac,
+      canac: g.canac,
       dep: `${g.dep},${v.dep}`,
       arr: `${g.arr},${v.arr}`,
       tTotal: round(g.tTotal + v.tTotal, 1),
@@ -159,7 +159,7 @@ const groupNav = (d: SACIData[]) => {
       tIFR: round(g.tIFR + v.tIFR, 1),
       tCapt: round(g.tCapt + v.tCapt, 1),
       ldg: g.ldg + v.ldg,
-      NM: round(g.NM + v.NM, 1),
+      nm: round(g.nm + v.nm, 1),
       func: groupString(g.func, v.func),
       obs: groupString(g.obs, v.obs),
       status: groupString(g.status, v.status),
@@ -173,7 +173,7 @@ const groupNav = (d: SACIData[]) => {
 
 export const groupNavSaci = (saci: SACIData[]): SACIData[] => {
   const groupedData: SACIData[] = [];
-  const grpObject = groupBy(saci, (d) => `${dayjs(d.date).format('DD/MM/YYYY')}-${d.studentCanac}-${d.acft}`);
+  const grpObject = groupBy(saci, (d) => `${dayjs(d.date).format('DD/MM/YYYY')}-${d.canac}-${d.acft}`);
 
   for (const dayValues of Object.values(grpObject)) {
     const toSum: SACIData[] = [];

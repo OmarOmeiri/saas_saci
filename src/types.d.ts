@@ -5,7 +5,7 @@ type SAASData = {
   date: Date;
   acft: string;
   crew: string;
-  studentCanac: string;
+  canac: string;
   dep: string;
   arr: string;
   tTotal: number;
@@ -15,7 +15,7 @@ type SAASData = {
   tIFR: number;
   tCapt: number;
   ldg: number;
-  NM: number;
+  nm: number;
 };
 
 type SACIData = {
@@ -23,7 +23,7 @@ type SACIData = {
   date: Date;
   acft: string;
   crew: string;
-  studentCanac: string;
+  canac: string;
   dep: string;
   arr: string;
   tTotal: number;
@@ -33,11 +33,28 @@ type SACIData = {
   tIFR: number;
   tCapt: number;
   ldg: number;
-  NM: number;
+  nm: number;
   func: string;
   obs: string;
   status: string;
   reg: string;
   exclusionDate: string;
   excludedBy: string;
+}
+
+type TCompare = {
+  date: Date;
+  canac: string;
+  dep: string;
+  arr: string;
+  mat: string;
+  tTotal: number;
+  tDay: number;
+  tNight: number;
+  tNav: number;
+  tIFR: number;
+  tCapt: number;
+  ldg: number;
+  nm: number;
+  id: string;
 }

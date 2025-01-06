@@ -12,23 +12,43 @@ const getCellType = (value: unknown) => {
   }
 }
 
-export function JSONToXlsx<T extends Record<PropertyKey, unknown>>(data: T[], headers: (keyof T)[]) {
-  const HEADER_ROW: SheetData[number] = headers.map((h) => ({value: h as string, fontWeight: 'bold'}));
 
-  const DATA: SheetData = data.map(r => (
-    headers.map(h => {
-      const C = getCellType(r[h]);
-      return {type: C, value: C(r[h])}
-    })
-  ));
+export function JSONToXlsx(data: {data: Record<string, unknown>[], headers: string[], headerTranslate?: string[], sheetName: string}[]) {
+  const DATA = data.map((d) => {
+    const HEADER_ROW: SheetData[number] = (d.headerTranslate || d.headers).map((h) => ({value: h as string, fontWeight: 'bold'}));
 
-  DATA.unshift(HEADER_ROW)
+    const DATA: SheetData = d.data.map(r => (
+      d.headers.map(h => {
+        const C = getCellType(r[h]);
+        return {type: C, value: C(r[h])}
+      })
+    ));
+  
+    DATA.unshift(HEADER_ROW)
+    return {DATA, sheetName: d.sheetName}
+  });
 
-  return writeXlsxFile(DATA, {
-    columns: [
-      { width: 35 },
+
+
+  return writeXlsxFile(DATA.map(d => d.DATA), {
+    columns: [[
+      {width: 12},
+      {},
+      {width: 40},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {width: 12},
+    ],
+    [
+      { width: 40 },
       {},
       {}
-    ]
+    ]],
+    sheets: DATA.map(d => d.sheetName),
+    dateFormat: 'dd/mm/yyyy'
   })
+  
 }
