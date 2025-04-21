@@ -105,7 +105,14 @@ export const decimalToTime = (t: string) => {
   const splt = t.split('.');
   const int = splt[0];
   const dec = Number(splt[1]) | 0;
-  return `${String(int).padStart(2, '0')}:${String(dec * 6).padStart(2, '0')}`
+  return `${String(int).padStart(2, '0')}${String(dec * 6).padStart(2, '0')}`
+}
+
+const nmToString = (nm: string) => {
+  const splt = nm.split('.');
+  const int = splt[0];
+  const dec = Number(splt[1]) | 0;
+  return `${int}${String(dec).padEnd(2, '0')}`;
 }
 
 export function copySaasLine(evt: ClipboardEvent) {
@@ -119,12 +126,13 @@ export function copySaasLine(evt: ClipboardEvent) {
     return obj;
   }, {} as Record<keyof SAASData, string>);
   
+
   const copyData = {
-    date: data.date,
+    date: data.date.replace(/\//g, ''),
     ldg: data.ldg,
     func: 1,
     canac: data.canac,
-    nm: data.nm === '0' ? undefined : data.nm,
+    nm: data.nm === '0' ? undefined : nmToString(data.nm),
     acft: data.acft,
     dep: data.dep,
     arr: data.arr,
