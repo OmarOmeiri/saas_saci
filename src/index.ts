@@ -150,10 +150,12 @@ function downloadSAASCodeBtnHandler(e: MouseEvent): void {
   showToast('Códido copiado!');
 }
 
-function downloadTPMCodeBtnHandler(e: MouseEvent): void {
+function downloadTPMCodeBtnHandler(e: MouseEvent) {
   e.preventDefault();
-  copyToClipboard(TAMPERMONKEY_CODE);
-  showToast('Códido copiado!');
+  // copyToClipboard(TAMPERMONKEY_CODE);
+  // showToast('Códido copiado!');\
+  window.open('https://omar-public.s3.us-east-1.amazonaws.com/SACIBOT/app.exe', '_blank');//the behavior is defined by the browser and user options
+  return false;//It prevents the default action associated with the event
 }
 
 function divergentTrMouseEnterHandler(e: MouseEvent): void {
