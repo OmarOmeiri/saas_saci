@@ -1,6 +1,7 @@
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { isEqual, uniqBy } from "lodash"
+import { COL_ORDER } from "./consts";
 
 dayjs.extend(customParseFormat)
 
@@ -95,4 +96,44 @@ export function parentByTag(el: HTMLElement, tagName: string) {
   } else {
       return parentByTag(el.parentElement, tagName)
   }
+}
+
+export const decimalToTime = (t: string) => {
+  if (Number.isNaN(Number(t))) {
+    throw new Error('Não foi possivel copiar.')
+  }
+  const splt = t.split('.');
+  const int = splt[0];
+  const dec = Number(splt[1]) | 0;
+  return `${String(int).padStart(2, '0')}:${String(dec * 6).padStart(2, '0')}`
+}
+
+export function copySaasLine(evt: ClipboardEvent) {
+  const saasSelection = document.querySelector('#saas-tbl .highlight-tr') as HTMLTableRowElement;
+  if (!saasSelection) return;
+  evt.preventDefault();
+  const saasChildren = Array.from(saasSelection.children) as HTMLElement[];
+  const data = COL_ORDER.saas.slice(0, COL_ORDER.saas.length - 1).reduce((obj, col, i) => {
+    if (COL_ORDER.saci.indexOf(col) < 0) return obj;
+    obj[col] = saasChildren[i].innerText;
+    return obj;
+  }, {} as Record<keyof SAASData, string>);
+  
+  const copyData = {
+    date: data.date,
+    ldg: data.ldg,
+    func: 1,
+    canac: data.canac,
+    nm: data.nm === '0' ? undefined : data.nm,
+    acft: data.acft,
+    dep: data.dep,
+    arr: data.arr,
+    tDay: data.tDay === '0' ? undefined : decimalToTime(data.tDay),
+    tNight: data.tNight === '0' ? undefined : decimalToTime(data.tNight),
+    tNav: data.tNav === '0' ? undefined : decimalToTime(data.tNav),
+    tIFR: data.tIFR === '0' ? undefined : decimalToTime(data.tIFR),
+    tCapt: data.tCapt === '0' ? undefined : decimalToTime(data.tCapt),
+  };
+
+  evt.clipboardData.setData('text/plain', JSON.stringify(copyData, undefined, 2));
 }

@@ -61,6 +61,105 @@ const run = () => {
 
 run();`;
 
+export const TAMPERMONKEY_CODE = `
+// ==UserScript==
+// @name         SACI AutoFill
+// @namespace    http://tampermonkey.net/
+// @version      2025-04-20
+// @description  try to take over the world!
+// @author       Omar
+// @match        *://sistemas.anac.gov.br/SACI/CIV/Digital/incluirCIV.asp
+// @match        *://sistemas.anac.gov.br/SACI/CIV/*
+// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @grant        none
+// ==/UserScript==
+const xpath = (xpath) => {
+    const result = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null);
+    let nodes = [];
+    let node = result.iterateNext();
+    while (node) {
+        nodes.push(node);
+        node = result.iterateNext();
+    }
+    return nodes;
+}
+
+const selectors = {
+    date: '//input[@name="txtDataRegistroVoo"]',
+    ldg: '//input[@name="txtPousos"]',
+    func: '//select[@name="cmbFuncao"]',
+    canac: '//input[@name="CD_ANAC_INSTRUENDO"]',
+    nm: '//input[@name="txtQtMilhaNavegacao"]',
+    acft: '//input[@name="txtMatricula"]',
+    dep: '//input[@name="txtOrigem"]',
+    arr: '//input[@name="txtDestino"]',
+    tDay: '//input[@name="txtDiurno"]',
+    tNight: '//input[@name="txtNoturno"]',
+    tNav: '//input[@name="txtNavegacao"]',
+    tIFR: '//input[@name="txtInstrumento"]',
+    tCapt: '//input[@name="txtCapota"]'
+};
+
+const clearInputs = () => {
+    for (const sel of Object.values(selectors)) {
+        const elems = xpath(sel);
+        if (!elems.length) continue;
+        const elem = elems[0];
+        if (elem.tagName = 'INPUT') {
+            elem.value = '';
+        }
+    }
+}
+
+const fillForm = async () => {
+    clearInputs();
+    const text = await navigator.clipboard.readText();
+    try {
+        const flt = JSON.parse(text);
+        //console.log(flt);
+        for (const k of Object.keys(flt)) {
+            if (!(k in selectors)) throw new Error(\`A key \${k} não foi encontrada.\`);
+        }
+        Object.entries(flt).forEach(([k, v]) => {
+            const res = xpath(selectors[k]);
+            if (!res) return;
+            const [elem] = res;
+            if (k === 'func') {
+                elem.selectedIndex = 0;
+                elem.onchange();
+                return;
+            }
+            elem.value = v;
+        });
+    } catch (e) {
+        console.error(e);
+        alert('Não há voo copiado!')
+    }
+};
+
+const addButton = () => {
+    const hasBtn = document.getElementById('fill-btn');
+    if (hasBtn) return;
+    const btn = document.createElement('button');
+    btn.id = 'fill-btn';
+    btn.addEventListener('click', fillForm);
+    btn.innerText = 'Preencher';
+    btn.style.cssText = \`
+    display: block;
+    position: fixed;
+    top: 0;
+    padding: 10px;
+    background-color: #eb7b7b;
+\`;
+    document.body.appendChild(btn)
+}
+
+(function() {
+    'use strict';
+    console.log('hey');
+    addButton();
+})();`;
+
 
 export const COL_ORDER: {
   saci: (keyof SACIData)[],

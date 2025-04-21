@@ -4,8 +4,8 @@ import { makeTable } from './tables'
 import { groupNavSaci, saasToData, saciToData } from './data';
 import { compareData } from './compare';
 import { getNotRegisteredStudents } from './export';
-import { copyToClipboard, download } from './utils';
-import { SAAS_CODE } from './consts';
+import { copyToClipboard, download, copySaasLine } from './utils';
+import { SAAS_CODE, TAMPERMONKEY_CODE } from './consts';
 import { showToast } from './toast';
 import { makeCompareSelectionTable } from './selectionTable';
 import { makeConfigDialogContent } from './configDialog';
@@ -22,6 +22,7 @@ const upldSaciBtn = document.querySelector("#upld-saci");
 const compareBtn = document.querySelector("#compare-btn");
 const exportBtn = document.querySelector("#export-students-btn");
 const downloadSAASCodeBtn = document.querySelector("#download-saas-btn");
+const downloadTPMCodeBtn = document.querySelector("#download-tpm-btn");
 const compareSelectionBtn = document.querySelector("#compare-selection-btn");
 const configBtn = document.querySelector("#config-btn");
 const closeDialogBtn = document.querySelector("#close-dialog-btn");
@@ -40,11 +41,13 @@ function main(): void {
     compareBtn?.addEventListener("click", () => compareBtnHandler());
     exportBtn?.addEventListener("click", exportStudentsBtnHandler);
     downloadSAASCodeBtn?.addEventListener("click", downloadSAASCodeBtnHandler);
+    downloadTPMCodeBtn?.addEventListener("click", downloadTPMCodeBtnHandler);
     compareSelectionBtn?.addEventListener("click", compareSelectionBtnHandler);
     closeDialogBtn?.addEventListener("click", closeDialogBtnHandler);
     groupNavCheckbox?.addEventListener("change", groupNavHandler);
     configBtn?.addEventListener("click", configBtnHandler);
     document.addEventListener('click', onDocumentClickHandler)
+    document.addEventListener('copy', copySaasLine);
 }
 
 function onDialogAttributeChange(mutation: MutationRecord) {
@@ -144,6 +147,12 @@ function updlSaasBtnHandler(e: MouseEvent): void {
 function downloadSAASCodeBtnHandler(e: MouseEvent): void {
   e.preventDefault();
   copyToClipboard(SAAS_CODE);
+  showToast('Códido copiado!');
+}
+
+function downloadTPMCodeBtnHandler(e: MouseEvent): void {
+  e.preventDefault();
+  copyToClipboard(TAMPERMONKEY_CODE);
   showToast('Códido copiado!');
 }
 
