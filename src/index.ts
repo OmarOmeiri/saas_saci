@@ -5,7 +5,7 @@ import { groupNavSaci, saasToData, saciToData } from './data';
 import { compareData } from './compare';
 import { getNotRegisteredStudents } from './export';
 import { copyToClipboard, download, copySaasLine } from './utils';
-import { SAAS_CODE, TAMPERMONKEY_CODE } from './consts';
+import { SAAS_CODE } from './consts';
 import { showToast } from './toast';
 import { makeCompareSelectionTable } from './selectionTable';
 import { makeConfigDialogContent } from './configDialog';
@@ -154,7 +154,7 @@ function downloadTPMCodeBtnHandler(e: MouseEvent) {
   e.preventDefault();
   // copyToClipboard(TAMPERMONKEY_CODE);
   // showToast('Códido copiado!');\
-  window.open('https://omar-public.s3.us-east-1.amazonaws.com/SACIBOT/app.exe', '_blank');//the behavior is defined by the browser and user options
+  window.open('https://omar-public.s3.us-east-1.amazonaws.com/SACIBOT/LANCADOR_DE_HORAS_SACI.exe', '_blank');//the behavior is defined by the browser and user options
   return false;//It prevents the default action associated with the event
 }
 
