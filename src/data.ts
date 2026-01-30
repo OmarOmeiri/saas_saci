@@ -50,13 +50,13 @@ const saciXLTToData = async (saci: string): Promise<TCSVData> => {
   const header: string[] = [];
   const data: string[][] = [];
   Array.from(xmlDoc.getElementsByTagName("tr"))
-  .forEach((row, i) => {
-     if (!i) {
-      header.push(...Array.from(row.children).map(c => c.innerHTML), 'id')
-     } else {
-      data.push([...Array.from(row.children).map(c => c.innerHTML), uniqid()])
-     }
-  });
+    .forEach((row, i) => {
+      if (!i) {
+        header.push(...Array.from(row.children).map(c => c.innerHTML), 'id')
+      } else {
+        data.push([...Array.from(row.children).map(c => c.innerHTML), uniqid()])
+      }
+    });
 
   return {
     header,
@@ -76,8 +76,8 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
       acft: d[COLMAP_INDEX.saas.acft].replace('-', '').trim(),
       crew: d[COLMAP_INDEX.saas.crew].replace(/\(\d+\)/, '').trim(),
       canac: getCanacSaas(d[COLMAP_INDEX.saas.crew]),
-      dep: d[COLMAP_INDEX.saas.depArr].split('-')[0].trim(),
-      arr: d[COLMAP_INDEX.saas.depArr].split('-')[1].trim(),
+      dep: d[COLMAP_INDEX.saas.depArr].split('=>')[0].trim(),
+      arr: d[COLMAP_INDEX.saas.depArr].split('=>')[1].trim(),
       tTotal: Number(d[COLMAP_INDEX.saas.tTotal]),
       tDay: Number(d[COLMAP_INDEX.saas.tDay]),
       tNight: Number(d[COLMAP_INDEX.saas.tNight]),
@@ -90,28 +90,29 @@ function toJson(data: TCSVData, type: 'saas' | 'saci'): SAASData[] | SACIData[] 
   }
   return data.data.map((d) => {
     return {
-    id: d[d.length - 1],
-    date: dayjs(d[COLMAP_INDEX.saci.date], 'D/M/YYYY').toDate(),
-    acft: d[COLMAP_INDEX.saci.acft],
-    crew: d[COLMAP_INDEX.saci.crew],
-    canac: getCanacSaci(d[COLMAP_INDEX.saci.crew]),
-    dep: d[COLMAP_INDEX.saci.dep],
-    arr: d[COLMAP_INDEX.saci.arr],
-    tTotal: saciTimeToDecimal(d[COLMAP_INDEX.saci.tDay]) + saciTimeToDecimal(d[COLMAP_INDEX.saci.tNight]),
-    tDay: saciTimeToDecimal(d[COLMAP_INDEX.saci.tDay]),
-    tNight: saciTimeToDecimal(d[COLMAP_INDEX.saci.tNight]),
-    tNav: saciTimeToDecimal(d[COLMAP_INDEX.saci.tNav]),
-    tIFR: saciTimeToDecimal(d[COLMAP_INDEX.saci.tIFR]),
-    tCapt: saciTimeToDecimal(d[COLMAP_INDEX.saci.tCapt]),
-    ldg: Number(d[COLMAP_INDEX.saci.ldg]),
-    nm: Number(d[COLMAP_INDEX.saci.NM].replace(',', '.').trim()),
-    func: d[COLMAP_INDEX.saci.func].trim(),
-    obs: d[COLMAP_INDEX.saci.obs].trim(),
-    status: d[COLMAP_INDEX.saci.status].trim(),
-    reg: d[COLMAP_INDEX.saci.reg].trim(),
-    exclusionDate: d[COLMAP_INDEX.saci.exclusionDate].trim(),
-    excludedBy: d[COLMAP_INDEX.saci.excludedBy].trim()
-  }});
+      id: d[d.length - 1],
+      date: dayjs(d[COLMAP_INDEX.saci.date], 'D/M/YYYY').toDate(),
+      acft: d[COLMAP_INDEX.saci.acft],
+      crew: d[COLMAP_INDEX.saci.crew],
+      canac: getCanacSaci(d[COLMAP_INDEX.saci.crew]),
+      dep: d[COLMAP_INDEX.saci.dep],
+      arr: d[COLMAP_INDEX.saci.arr],
+      tTotal: saciTimeToDecimal(d[COLMAP_INDEX.saci.tDay]) + saciTimeToDecimal(d[COLMAP_INDEX.saci.tNight]),
+      tDay: saciTimeToDecimal(d[COLMAP_INDEX.saci.tDay]),
+      tNight: saciTimeToDecimal(d[COLMAP_INDEX.saci.tNight]),
+      tNav: saciTimeToDecimal(d[COLMAP_INDEX.saci.tNav]),
+      tIFR: saciTimeToDecimal(d[COLMAP_INDEX.saci.tIFR]),
+      tCapt: saciTimeToDecimal(d[COLMAP_INDEX.saci.tCapt]),
+      ldg: Number(d[COLMAP_INDEX.saci.ldg]),
+      nm: Number(d[COLMAP_INDEX.saci.NM].replace(',', '.').trim()),
+      func: d[COLMAP_INDEX.saci.func].trim(),
+      obs: d[COLMAP_INDEX.saci.obs].trim(),
+      status: d[COLMAP_INDEX.saci.status].trim(),
+      reg: d[COLMAP_INDEX.saci.reg].trim(),
+      exclusionDate: d[COLMAP_INDEX.saci.exclusionDate].trim(),
+      excludedBy: d[COLMAP_INDEX.saci.excludedBy].trim()
+    }
+  });
 }
 
 
